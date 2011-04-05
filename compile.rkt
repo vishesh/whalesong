@@ -821,20 +821,22 @@
 (: compile-procedure-call/statically-known-lam 
    (StaticallyKnownLam CompileTimeEnvironment CompileTimeEnvironment Natural Target Linkage -> InstructionSequence))
 (define (compile-procedure-call/statically-known-lam static-knowledge cenv extended-cenv n target linkage)
-  (let*: ([after-call : LabelLinkage (make-LabelLinkage (make-label 'afterCall))]
-          [compiled-linkage : Linkage (if (ReturnLinkage? linkage)
-                                          linkage
-                                          after-call)])
-         (append-instruction-sequences
-          (compile-proc-appl extended-cenv 
-                             (make-Label (StaticallyKnownLam-entry-point static-knowledge))
-                             n 
-                             target
-                             compiled-linkage)
-          (end-with-linkage
-           linkage
-           cenv
-           (LabelLinkage-label after-call)))))
+  (let-values ([(after-call-multiple
+                 after-call-single)
+                (make-paired-labels 'afterCallMultiple 'afterCallSingle)])
+    (let*: ([compiled-linkage : Linkage (if (ReturnLinkage? linkage)
+                                            linkage
+                                            (make-Label after-call-single))])
+           (append-instruction-sequences
+            (compile-proc-appl extended-cenv 
+                               (make-Label (StaticallyKnownLam-entry-point static-knowledge))
+                               n 
+                               target
+                               compiled-linkage)
+            (end-with-linkage
+             linkage
+             cenv
+             after-call-single)))))
 
 
 

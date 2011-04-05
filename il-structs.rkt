@@ -304,10 +304,10 @@
 
 
 
-(: make-paired-labels (Symbol -> (values Symbol PairedLabel)))
-(define (make-paired-labels name)
-  (let* ([first-label (make-label name)]
-         [second-label (make-label name)])
+(: make-paired-labels (Symbol Symbol -> (values Symbol PairedLabel)))
+(define (make-paired-labels first-name second-name)
+  (let* ([first-label (make-label first-name)]
+         [second-label (make-label second-name)])
   (values first-label (make-PairedLabel second-label first-label))))
 
 

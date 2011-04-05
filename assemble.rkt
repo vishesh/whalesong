@@ -29,6 +29,10 @@
                        (displayln (assemble-basic-block basic-block) op)
                        (newline op))
               basic-blocks)
+    (for-each (lambda: ([a-paired-label : PairedLabel])
+                       (assemble-paired-label a-paired-label op)
+                       (newline op))
+              (collect-paired-labels stmts))
     (fprintf op "MACHINE.params.currentErrorHandler = fail;\n")
     (fprintf op "MACHINE.params.currentSuccessHandler = success;\n")
     (fprintf op #<<EOF
@@ -124,7 +128,18 @@ EOF
 
 
 
-
+(: collect-paired-labels ((Listof Statement) -> (Listof PairedLabel)))
+(define (collect-paired-labels stmts)
+  (cond
+    [(empty? stmts)
+     empty]
+    [else
+     (let ([first-stmt (first stmts)])
+       (cond
+         [(PairedLabel? first-stmt)
+          (cons first-stmt (collect-paired-labels (rest stmts)))]
+         [else
+          (collect-paired-labels (rest stmts))]))]))
 
 
 ;; collect-general-jump-targets: (listof stmt) -> (listof label)
@@ -493,3 +508,10 @@ EOF
      (assemble-label a-location)]))
 
 
+(: assemble-paired-label (PairedLabel Output-Port -> 'ok))
+;; Write out the code to make it easy to jump to the previous label.
+(define (assemble-paired-label a-paired-label op)
+  (fprintf op "~a.predecessor = ~a;"
+           (PairedLabel-label a-paired-label)
+           (PairedLabel-previous a-paired-label))
+  'ok)
