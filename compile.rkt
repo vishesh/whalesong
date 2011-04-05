@@ -778,44 +778,54 @@
 ;; cenv is the compile-time enviroment before arguments have been shifted in.
 ;; extended-cenv is the compile-time environment after arguments have been shifted in.
 (define (compile-general-procedure-call cenv extended-cenv n target linkage)
-  (let: ([primitive-branch : LabelLinkage (make-LabelLinkage (make-label 'primitiveBranch))]
-         [compiled-branch : LabelLinkage (make-LabelLinkage (make-label 'compiledBranch))]
-         [after-call : LabelLinkage (make-LabelLinkage (make-label 'afterCall))])
-        (let: ([compiled-linkage : Linkage (if (ReturnLinkage? linkage)
-                                               linkage
-                                               after-call)])
-              (append-instruction-sequences
-               (make-instruction-sequence 
-                `(,(make-TestAndBranchStatement 'primitive-procedure?
-                                                'proc
-                                                (LabelLinkage-label primitive-branch))))
-               
-               
-               ;; Compiled branch
-               (LabelLinkage-label compiled-branch)
-               (make-instruction-sequence
-                `(,(make-PerformStatement (make-CheckClosureArity! n))))
-               (compile-proc-appl extended-cenv (make-Reg 'val) n target compiled-linkage)
-               
-               
-               
-               (LabelLinkage-label primitive-branch)
-               (end-with-linkage
-                linkage
-                cenv
+  (let-values ([(after-call-multiple after-call-single)
+                (make-paired-labels 'afterCallMultiple 'afterCallSingle)])
+    (let: ([primitive-branch : LabelLinkage (make-LabelLinkage (make-label 'primitiveBranch))]
+           [compiled-branch : LabelLinkage (make-LabelLinkage (make-label 'compiledBranch))])
+          (let: ([compiled-linkage : Linkage 
+                                   (if (ReturnLinkage? linkage)
+                                       linkage
+                                       (make-LabelLinkage (PairedLabel-label after-call-single)))])
                 (append-instruction-sequences
                  (make-instruction-sequence 
-                  `(,(make-AssignPrimOpStatement 
-                      ;; Optimization: we put the result directly in the registers, or in
-                      ;; the appropriate spot on the stack.  This takes into account the popenviroment
-                      ;; that happens right afterwards.
-                      (adjust-target-depth target n)                     
-                      (make-ApplyPrimitiveProcedure n))))
-                 (if (not (= n 0))
-                     (make-instruction-sequence
-                      `(,(make-PopEnvironment n 0)))
-                     empty-instruction-sequence)
-                 (LabelLinkage-label after-call)))))))
+                  `(,(make-TestAndBranchStatement 'primitive-procedure?
+                                                  'proc
+                                                  (LabelLinkage-label primitive-branch))))
+                 
+                 
+                 ;; Compiled branch
+                 (LabelLinkage-label compiled-branch)
+                 (make-instruction-sequence
+                  `(,(make-PerformStatement (make-CheckClosureArity! n))))
+                 (compile-proc-appl extended-cenv
+                                    (make-Reg 'val)
+                                    n 
+                                    target
+                                    compiled-linkage)
+                                  
+                 
+                 (LabelLinkage-label primitive-branch)
+                 (end-with-linkage
+                  linkage
+                  cenv
+                  (append-instruction-sequences
+                   (make-instruction-sequence 
+                    `(,(make-AssignPrimOpStatement 
+                        ;; Optimization: we put the result directly in the registers, or in
+                        ;; the appropriate spot on the stack.  This takes into account the popenviroment
+                        ;; that happens right afterwards.
+                        (adjust-target-depth target n)                     
+                        (make-ApplyPrimitiveProcedure n))))
+                   (if (not (= n 0))
+                       (make-instruction-sequence
+                        `(,(make-PopEnvironment n 0)))
+                       empty-instruction-sequence)
+                   (make-instruction-sequence
+                    `(,(make-GotoStatement (make-Label (PairedLabel-label after-call-single)))))
+                   
+                   (make-instruction-sequence 
+                    `(,after-call-multiple
+                      ,after-call-single)))))))))
 
 
 (: compile-procedure-call/statically-known-lam 
@@ -824,9 +834,10 @@
   (let-values ([(after-call-multiple
                  after-call-single)
                 (make-paired-labels 'afterCallMultiple 'afterCallSingle)])
-    (let*: ([compiled-linkage : Linkage (if (ReturnLinkage? linkage)
-                                            linkage
-                                            (make-Label after-call-single))])
+    (let*: ([compiled-linkage : Linkage 
+                              (if (ReturnLinkage? linkage)
+                                  linkage
+                                  (make-LabelLinkage (PairedLabel-label after-call-single)))])
            (append-instruction-sequences
             (compile-proc-appl extended-cenv 
                                (make-Label (StaticallyKnownLam-entry-point static-knowledge))
@@ -836,7 +847,9 @@
             (end-with-linkage
              linkage
              cenv
-             after-call-single)))))
+             (make-instruction-sequence
+              `(,after-call-multiple
+                ,after-call-single)))))))
 
 
 

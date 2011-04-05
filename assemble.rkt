@@ -14,14 +14,15 @@
 
 
 ;; Parameter that controls the generation of a trace.
-(define current-emit-debug-trace? (make-parameter #f))
+(define current-emit-debug-trace? (make-parameter #t))
 
 
 
 (: assemble/write-invoke ((Listof Statement) Output-Port -> Void))
 ;; Writes out the JavaScript code that represents the anonymous invocation expression.
 (define (assemble/write-invoke stmts op)
-  (let ([basic-blocks (fracture stmts)])
+  (let* ([basic-blocks (fracture stmts)]
+         [basic-block-labels (map BasicBlock-name basic-blocks)])
     (fprintf op "(function(MACHINE, success, fail, params) {\n")
     (fprintf op "var param;\n")
     (fprintf op "var RUNTIME = plt.runtime;\n")
@@ -30,8 +31,13 @@
                        (newline op))
               basic-blocks)
     (for-each (lambda: ([a-paired-label : PairedLabel])
-                       (assemble-paired-label a-paired-label op)
-                       (newline op))
+                       (cond [(member (PairedLabel-label a-paired-label)
+                                      basic-block-labels)
+                              
+                              (assemble-paired-label a-paired-label op)
+                              (newline op)]
+                             [else
+                              (void)]))
               (collect-paired-labels stmts))
     (fprintf op "MACHINE.params.currentErrorHandler = fail;\n")
     (fprintf op "MACHINE.params.currentSuccessHandler = success;\n")
