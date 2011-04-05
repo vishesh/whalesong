@@ -68,31 +68,59 @@ EOF
             [(null? stmts)
              (reverse (cons (make-BasicBlock name (reverse acc))
                             basic-blocks))]
-            [(symbol? (car stmts))
-             (cond
-               [(member (car stmts) jump-targets)
-                (loop (car stmts)
-                      '()
-                      (cons (make-BasicBlock name  
-                                             (if last-stmt-goto? 
-                                                 (reverse acc)
-                                                 (reverse (append `(,(make-GotoStatement (make-Label (car stmts))))
-                                                                  acc))))
-                            basic-blocks)
-                      (cdr stmts)
-                      last-stmt-goto?)]
-               [else
-                (loop name
-                      acc
-                      basic-blocks
-                      (cdr stmts)
-                      last-stmt-goto?)])]
             [else
-             (loop name
-                   (cons (car stmts) acc)
-                   basic-blocks
-                   (cdr stmts)
-                   (GotoStatement? (car stmts)))]))))
+             (let ([first-stmt (car stmts)])
+               (cond
+                 
+                 [(symbol? first-stmt)
+                  (cond
+                    [(member first-stmt jump-targets)
+                     (loop first-stmt
+                           '()
+                           (cons (make-BasicBlock 
+                                  name  
+                                  (if last-stmt-goto? 
+                                      (reverse acc)
+                                      (reverse (append `(,(make-GotoStatement (make-Label first-stmt)))
+                                                       acc))))
+                                 basic-blocks)
+                           (cdr stmts)
+                           last-stmt-goto?)]
+                    [else
+                     (loop name
+                           acc
+                           basic-blocks
+                           (cdr stmts)
+                           last-stmt-goto?)])]
+                 
+                 [(PairedLabel? first-stmt)
+                  (cond
+                    [(member (PairedLabel-label first-stmt) jump-targets)
+                     (loop (PairedLabel-label first-stmt)
+                           '()
+                           (cons (make-BasicBlock 
+                                  name  
+                                  (if last-stmt-goto? 
+                                      (reverse acc)
+                                      (reverse (append `(,(make-GotoStatement 
+                                                           (make-Label (PairedLabel-label first-stmt))))
+                                                       acc))))
+                                 basic-blocks)
+                           (cdr stmts)
+                           last-stmt-goto?)]
+                    [else
+                     (loop name
+                           acc
+                           basic-blocks
+                           (cdr stmts)
+                           last-stmt-goto?)])]
+                 
+                 [else
+                  (loop name
+                        (cons first-stmt acc)
+                        basic-blocks
+                        (cdr stmts)
+                        (GotoStatement? first-stmt))]))]))))
 
 
 
@@ -176,6 +204,8 @@ EOF
                   (append (cond
                             [(symbol? stmt)
                              empty]
+                            [(PairedLabel? stmt)
+                             (list (PairedLabel-previous stmt))]
                             [(AssignImmediateStatement? stmt)
                              (let: ([v : OpArg (AssignImmediateStatement-value stmt)])
                                    (cond 

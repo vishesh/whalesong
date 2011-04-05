@@ -52,6 +52,9 @@
 
 
 
+  
+
+
 ;; instruction sequences
 (define-type UnlabeledStatement (U 
                                  
@@ -73,6 +76,7 @@
 
 (define-type Statement (U UnlabeledStatement
                           Symbol  ;; label
+                          PairedLabel
                           ))
 
 (define-struct: AssignImmediateStatement ([target : Target]
@@ -287,6 +291,24 @@
 (: statements (InstructionSequence -> (Listof Statement)))
 (define (statements s)
   (if (symbol? s) (list s) (instruction-sequence-statements s)))
+
+
+
+
+
+;; A PairedLabel is like a regular label, but it knows about
+;; a previous label as well.  Used for efficient implementation 
+;; of multiple return values.
+(define-struct: PairedLabel ([label : Symbol]
+                             [previous : Symbol]))
+
+
+
+(: make-paired-labels (Symbol -> (values Symbol PairedLabel)))
+(define (make-paired-labels name)
+  (let* ([first-label (make-label name)]
+         [second-label (make-label name)])
+  (values first-label (make-PairedLabel second-label first-label))))
 
 
 

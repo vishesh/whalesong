@@ -61,6 +61,8 @@
                           (let: ([stmt : Statement (vector-ref (machine-text m) i)])
                                 (when (symbol? stmt)
                                   (hash-set! (machine-jump-table m) stmt i))
+                                (when (PairedLabel? stmt)
+                                  (hash-set! (machine-jump-table m) (PairedLabel-label stmt) i))
                                 (loop (add1 i)))))
                   m))]))
 
@@ -87,6 +89,8 @@
           [result : 'ok
                   (cond
                     [(symbol? i)
+                     'ok]
+                    [(PairedLabel? i)
                      'ok]
                     [(AssignImmediateStatement? i)
                      (step-assign-immediate! m i)]
