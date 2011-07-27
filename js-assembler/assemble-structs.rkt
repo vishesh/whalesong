@@ -18,7 +18,7 @@
 
 
 
-(define-struct: ComputedJump ([label : (U  Reg
+(define-struct: ComputedJump ([label : (U Reg
                                           ModuleEntry
                                           CompiledProcedureEntry)])
   #:transparent)
