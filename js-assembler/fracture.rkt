@@ -13,6 +13,11 @@
          racket/string
          racket/list)
 
+;; Takes a sequence of statements, and breaks them down into basic
+;; blocks.
+;;
+;; A basic block consists of a name, a sequence of straight-line statements,
+;; followed by a branch (or the absence of a branch).
 
 (provide fracture)
 
@@ -43,36 +48,30 @@
                   (reverse (cons (make-BasicBlock name (reverse acc))
                                  basic-blocks))]
                  [else
+
+                  (: do-on-label (Symbol -> (Listof BasicBlock)))
+                  (define (do-on-label label-name)
+                    (loop label-name
+                          '()
+                          (cons (make-BasicBlock 
+                                 name  
+                                 (if last-stmt-goto? 
+                                     (reverse acc)
+                                     (reverse (append `(,(make-GotoStatement (make-Label label-name)))
+                                                      acc))))
+                                basic-blocks)
+                          (cdr stmts)
+                          last-stmt-goto?))
+
                   (let: ([first-stmt : Statement (car stmts)])
-                        (: do-on-label (Symbol -> (Listof BasicBlock)))
-                        (define (do-on-label label-name)
-                          (cond
-                            [(member label-name jump-targets)
-                             (loop label-name
-                                   '()
-                                   (cons (make-BasicBlock 
-                                          name  
-                                          (if last-stmt-goto? 
-                                              (reverse acc)
-                                              (reverse (append `(,(make-GotoStatement (make-Label label-name)))
-                                                               acc))))
-                                         basic-blocks)
-                                   (cdr stmts)
-                                   last-stmt-goto?)]
-                            [else
-                             (loop name
-                                   acc
-                                   basic-blocks
-                                   (cdr stmts)
-                                   last-stmt-goto?)]))
-                        (cond
-                          [(symbol? first-stmt)
-                           (do-on-label first-stmt)]
-                          [(LinkedLabel? first-stmt)
-                           (do-on-label (LinkedLabel-label first-stmt))]
-                          [else
-                           (loop name
-                                 (cons first-stmt acc)
-                                 basic-blocks
-                                 (cdr stmts)
-                                 (GotoStatement? (car stmts)))]))]))))
+                    (cond
+                     [(symbol? first-stmt)
+                      (do-on-label first-stmt)]
+                     [(LinkedLabel? first-stmt)
+                      (do-on-label (LinkedLabel-label first-stmt))]
+                     [else
+                      (loop name
+                            (cons first-stmt acc)
+                            basic-blocks
+                            (cdr stmts)
+                            (GotoStatement? (car stmts)))]))]))))
