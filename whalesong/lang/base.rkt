@@ -17,9 +17,11 @@
          (all-from-out "private/call-ec.rkt")
          (all-from-out "private/with-handlers.rkt")
          (all-from-out "list.rkt")
-         quasiquote)
+         quasiquote
+         λ)
          
-(require "private/list.rkt"
+(require (for-syntax racket/base)
+         "private/list.rkt"
          "private/map.rkt"
          "private/hash.rkt"
          "private/call-ec.rkt"
@@ -30,3 +32,5 @@
 
 ;; Kludge: This forces modbeg to be compiled and packaged.
 (require racket/private/modbeg)
+
+(define-syntax λ (make-rename-transformer #'lambda))

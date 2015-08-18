@@ -1,4 +1,5 @@
-#lang whalesong
+#lang s-exp "base.rkt"
+
 (provide make-parameter parameterize)
 
 ;;;

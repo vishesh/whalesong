@@ -1,4 +1,4 @@
-#lang whalesong
+#lang s-exp "../../base.rkt"
 
 (require (only-in "runtime.rkt"
                   match-equality-test

@@ -1,4 +1,5 @@
-#lang whalesong
+#lang s-exp "base.rkt"
+
 (require "private/match/match.rkt" "private/match/runtime.rkt"
          (for-syntax racket/base))
 

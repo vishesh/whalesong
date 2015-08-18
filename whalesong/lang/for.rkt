@@ -1,4 +1,5 @@
-#lang whalesong
+#lang s-exp "kernel.rkt"
+
 (require (for-syntax racket))
 (provide for/fold for*/fold
          for for*
@@ -14,7 +15,7 @@
          for/hash for*/hash
          for/hasheq for*/hasheq
          for/hasheqv for*/hasheqv
-         
+
          for/fold/derived for*/fold/derived
          (for-syntax split-for-body)
          (for-syntax (rename-out [expand-clause expand-for-clause]))
@@ -1103,7 +1104,7 @@
   (case-lambda
     [(producer)
      ;; simple stop-less version
-     (make-do-sequence (lambda () (values (λ _ (producer)) void (void) #f #f #f)))]
+     (make-do-sequence (lambda () (values (lambda _ (producer)) void (void) #f #f #f)))]
     [(producer stop . more)
      (define produce!
        (if (null? more)

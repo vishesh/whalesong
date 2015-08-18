@@ -1,4 +1,5 @@
-#lang whalesong
+#lang s-exp "../../base.rkt"
+
 (require "match-expander.rkt"
          (for-syntax racket/base
                      racket/struct-info

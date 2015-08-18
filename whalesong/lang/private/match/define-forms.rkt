@@ -1,4 +1,4 @@
-#lang whalesong
+#lang s-exp "../../base.rkt"
 
 (require (for-syntax racket/base
                      racket/syntax

@@ -1,4 +1,5 @@
-#lang whalesong
+#lang s-exp "../../base.rkt"
+
 (require "parameters.rkt") ; whalesong-libs
 
 (require racket/stxparam

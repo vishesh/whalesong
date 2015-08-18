@@ -1,4 +1,5 @@
-#lang whalesong
+#lang s-exp "../../base.rkt"
+
 ; This module contains a poor man's parameters.
 (provide make-parameter parameterize)
 

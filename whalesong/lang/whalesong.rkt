@@ -16,6 +16,7 @@
          "check-expect/check-expect.rkt"
          "bool.rkt"
          "posn.rkt"
+         "for.rkt"
          (for-syntax racket/base))
 
 ;; Programs written in Whalesong will have tracing enabled by default.
@@ -31,10 +32,9 @@
          shared
          (all-from-out "bool.rkt")
          (all-from-out "posn.rkt")
+         (all-from-out "for.rkt")
          (except-out (all-from-out "check-expect/check-expect.rkt")
-                     run-tests)
-
-         λ)
+                     run-tests))
 
 
 
@@ -44,10 +44,6 @@
      (syntax/loc stx
        (#%module-begin body ...
                        (run-tests)))]))
-
-
-(define-syntax λ (make-rename-transformer #'lambda))
-
 
 (define-syntax (my-define-struct stx)
   (syntax-case stx ()
