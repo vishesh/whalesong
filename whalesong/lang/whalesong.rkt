@@ -17,6 +17,7 @@
          "bool.rkt"
          "posn.rkt"
          "for.rkt"
+         "match.rkt"
          (for-syntax racket/base))
 
 ;; Programs written in Whalesong will have tracing enabled by default.
@@ -33,6 +34,7 @@
          (all-from-out "bool.rkt")
          (all-from-out "posn.rkt")
          (all-from-out "for.rkt")
+         (all-from-out "match.rkt")
          (except-out (all-from-out "check-expect/check-expect.rkt")
                      run-tests))
 

@@ -1,6 +1,6 @@
 #lang racket/base
 
-(require (for-template whalesong/lang/whalesong
+(require (for-template "../../base.rkt"
                        ; racket/base 
                        "runtime.rkt"
                        racket/stxparam
