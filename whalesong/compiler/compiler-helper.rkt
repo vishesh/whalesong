@@ -6,6 +6,8 @@
   (cond
    [(symbol? x)
     x]
+   [(keyword? x)
+    x]
    [(boolean? x)
     x]
    [(string? x)

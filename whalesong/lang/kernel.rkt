@@ -1,4 +1,5 @@
 #lang racket/base
+
 (require (prefix-in racket: (only-in racket/math pi sinh cosh sqr
                                      sgn conjugate))
          (prefix-in racket: racket/base)
@@ -377,6 +378,7 @@
  ;;  immutable?
  void?
  symbol?
+ keyword?
  string?
  char?
  boolean?

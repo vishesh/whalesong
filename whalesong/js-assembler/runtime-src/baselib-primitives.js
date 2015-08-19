@@ -29,6 +29,7 @@
     var isVector = baselib.vectors.isVector;
     var isString = baselib.strings.isString;
     var isSymbol = baselib.symbols.isSymbol;
+    var isKeyword = baselib.keywords.isKeyword;
     var isBox = baselib.boxes.isBox;
     var isStruct = baselib.structs.isStruct;
     var isStructType = baselib.structs.isStructType;
@@ -1212,6 +1213,21 @@
             return firstArg.toString();
         });
 
+    installPrimitiveProcedure(
+        'keyword?',
+        1,
+        function (M) {
+            var firstArg = M.e[M.e.length-1];
+            return isKeyword(firstArg);
+        });
+
+    installPrimitiveProcedure(
+        'keyword->string',
+        1,
+        function (M) {
+            var firstArg = checkSymbol(M, 'keyword->string', 0);
+            return firstArg.toString();
+        });
 
     installPrimitiveProcedure(
         'string=?',

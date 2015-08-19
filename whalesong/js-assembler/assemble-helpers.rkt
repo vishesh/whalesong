@@ -37,6 +37,8 @@
 
          current-interned-symbol-table
          assemble-current-interned-symbol-table
+         current-interned-keyword-table
+         assemble-current-interned-keyword-table
          )
 
 (require/typed typed/racket/base
@@ -145,6 +147,21 @@
                             variable-name
                             (symbol->string a-symbol))))
                  "\n"))
+
+(: current-interned-keyword-table (Parameterof (HashTable Keyword Symbol)))
+(define current-interned-keyword-table
+  (make-parameter ((inst make-hasheq Keyword Symbol))))
+
+
+(: assemble-current-interned-keyword-table (-> String))
+(define (assemble-current-interned-keyword-table)
+  (string-join (hash-map
+                  (current-interned-keyword-table)
+                  (lambda: ([a-keyword : Keyword] [variable-name : Symbol])
+                    (format "var ~a=RT.makeKeyword(~s);"
+                            variable-name
+                            (keyword->string a-keyword))))
+                 "\n"))
   
 ;; fixme: use js->string
 (: assemble-const (Const -> String))
@@ -160,6 +177,14 @@
                (symbol->string intern-var)
                ;;(format "RT.makeSymbol(~s)" (symbol->string val))
                ]
+              [(keyword? val)
+               (define intern-var (hash-ref (current-interned-keyword-table)
+                                            val
+                                            (lambda ()
+                                              (define fresh (gensym 'sym))
+                                              (hash-set! (current-interned-keyword-table) val fresh)
+                                              fresh)))
+               (symbol->string intern-var)]
               [(pair? val)
                (format "RT.makePair(~a,~a)" 
                        (loop (car val))

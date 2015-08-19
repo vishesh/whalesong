@@ -37,6 +37,7 @@
 ;; statements.
 (define (assemble/write-invoke stmts op trampoline-option)
   (parameterize ([current-interned-symbol-table ((inst make-hash Symbol Symbol))]
+                 [current-interned-keyword-table ((inst make-hash Keyword Symbol))]
                  [current-interned-constant-closure-table ((inst make-hash Symbol MakeCompiledProcedure))])
     (display "(function(M, success, fail, params) {\n" op)
     (display "\"use strict\";\n" op)
@@ -62,6 +63,7 @@
                   op)
     (write-linked-label-attributes stmts blockht op)
     (display (assemble-current-interned-symbol-table) op)
+    (display (assemble-current-interned-keyword-table) op)
     (display (assemble-current-interned-constant-closure-table) op)
     
     (display "M.params.currentErrorHandler = fail;\n" op)

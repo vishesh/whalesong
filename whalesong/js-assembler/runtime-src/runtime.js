@@ -30,6 +30,7 @@
     var isVector = baselib.vectors.isVector;
     var isString = baselib.strings.isString;
     var isSymbol = baselib.symbols.isSymbol;
+    var isKeyword = baselib.keywords.isKeyword;
     var isPath = baselib.paths.isPath;
 
     var equals = baselib.equality.equals;
@@ -49,6 +50,7 @@
 
 
     var makeSymbol = baselib.symbols.makeSymbol;
+    var makeKeyword = baselib.keywords.makeKeyword;
     var makePath = baselib.paths.makePath;
     var makeBytes = baselib.bytes.makeBytes;
     var makeBytesFromBase64 = baselib.bytes.makeBytesFromBase64;
@@ -1390,6 +1392,7 @@
     exports['makeBignum'] = makeBignum;
     exports['makeComplex'] = makeComplex;
     exports['makeSymbol'] = makeSymbol;
+    exports['makeKeyword'] = makeKeyword;
     exports['makePath'] = makePath;
     exports['makeBytes'] = makeBytes;
     exports['makeBytesFromBase64'] = makeBytesFromBase64;
@@ -1411,6 +1414,7 @@
     exports['isBox'] = isBox;
     exports['isString'] = isString;
     exports['isSymbol'] = isSymbol;
+    exports['isKeyword'] = isKeyword;
     exports['isPath'] = isPath;
     exports['isNumber'] = isNumber;
     exports['isNatural'] = isNatural;

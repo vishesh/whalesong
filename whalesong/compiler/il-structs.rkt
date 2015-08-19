@@ -76,6 +76,7 @@
 (define-type const-value
   (Rec C
        (U Symbol
+          Keyword
           String
           Number
           Boolean
