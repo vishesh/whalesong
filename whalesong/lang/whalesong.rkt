@@ -38,8 +38,6 @@
          (except-out (all-from-out "check-expect/check-expect.rkt")
                      run-tests))
 
-
-
 (define-syntax (my-module-begin stx)
   (syntax-case stx ()
     [(_ body ...)

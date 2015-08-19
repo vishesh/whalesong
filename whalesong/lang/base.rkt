@@ -17,6 +17,7 @@
          (all-from-out "private/call-ec.rkt")
          (all-from-out "private/with-handlers.rkt")
          (all-from-out "list.rkt")
+         (for-syntax (all-from-out racket/base)) ;;HACK: Shoud import selected?
          quasiquote
          λ)
          
