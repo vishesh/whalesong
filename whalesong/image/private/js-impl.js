@@ -487,8 +487,8 @@ EXPORTS['overlay/offset'] =
             var middleY = (img1.getHeight() - img2.getHeight()) / 2;
 	    return makeOverlayImage(img1,
 				    img2,
-				    jsnums.toFixnum(middleX) + deltaX,
-				    jsnums.toFixnum(middleY) + deltaY);
+				    jsnums.add(middleX, deltaX),
+				    jsnums.add(middleY, deltaY));
         });
 
 
@@ -552,8 +552,8 @@ EXPORTS['underlay/xy'] =
 	    var img2 = checkImage(MACHINE, "underlay/xy", 3);
 	    return makeOverlayImage(img2.updatePinhole(0, 0), 
 				    img1.updatePinhole(0, 0),
-				    -(jsnums.toFixnum(deltaX)),
-				    -(jsnums.toFixnum(deltaY)));
+				    jsnums.negate(deltaX),
+				    jsnums.negate(deltaY));
         });
 
 EXPORTS['underlay/offset'] = 
@@ -569,8 +569,8 @@ EXPORTS['underlay/offset'] =
             var middleY = (img1.getHeight() - img2.getHeight()) / 2;
 	    return makeOverlayImage(img2,
 				    img1,
-				    -(jsnums.toFixnum(middleX) + deltaX),
-				    -(jsnums.toFixnum(middleY) + deltaY));
+				    jsnums.negate(jsnums.add(middleX, deltaX)),
+				    jsnums.negate(jsnums.add(middleY, deltaY)));
         });
 
 EXPORTS['underlay/align'] = 
